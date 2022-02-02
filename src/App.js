@@ -7,32 +7,37 @@ function App() {
     const [movieName, setMovieName] = useState('');
     const [review, setReview] = useState('');
     const [movieReviewList, setMovieReviewList] = useState([])
-    const [newReview,setNewReview] = useState('')
+    const [newReview, setNewReview] = useState('')
 
-    useEffect(() => {
+
+    const getMovies = () => {
         axios.get("http://localhost:3001/api/get").then((response) => {
             setMovieReviewList(response.data)
         })
+    }
+    useEffect(() => {
+        getMovies()
     }, [])
 
-    const updateReview = (movie) => {
-        axios.put("http://localhost:3001/api/update",
+    const updateReview = async (movie) => {
+        await axios.put("http://localhost:3001/api/update",
             {
                 movieName: movie, movieReview: newReview
             })
         setNewReview("")
+        getMovies()
     }
-    const deleteReview = (movie) => {
-        axios.delete(`http://localhost:3001/api/delete/${movie}`)
+    const deleteReview = async (id) => {
+        await axios.delete(`http://localhost:3001/api/delete/${id}`)
+        getMovies()
     }
 
-    const submitReview = () => {
-        axios.post("http://localhost:3001/api/insert", {
+    const submitReview = async () => {
+        await axios.post("http://localhost:3001/api/insert", {
             movieName: movieName, movieReview: review
         });
 
         setMovieReviewList([...movieReviewList, {movieName: movieName, movieReview: review}]);
-
     }
     return (
         <div className="App">
@@ -56,16 +61,18 @@ function App() {
 
                         <h1> MovieName: {item.movieName}</h1>
                         <p>MovieReview: {item.movieReview}</p>
-                        <button onClick={() => {
-                            deleteReview(item.movieName);
+                        <button onClick={async () => {
+                            await deleteReview(item.id);
                         }}>Delete
                         </button>
-                        <input id='updateInput' type='text' onChange={(e)=>{
-                                setNewReview(e.target.value);
-                            }
+                        <input id='updateInput' type='text' onChange={(e) => {
+                            setNewReview(e.target.value);
+                        }
                         }/>
-                        <button onClick={()=>
-                            {updateReview(item.movieName)}}>Update</button>
+                        <button onClick={async () => {
+                            await updateReview(item.movieName)
+                        }}>Update
+                        </button>
 
                     </div>)
                 })}
