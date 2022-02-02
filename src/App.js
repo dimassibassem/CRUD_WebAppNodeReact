@@ -19,10 +19,10 @@ function App() {
         getMovies()
     }, [])
 
-    const updateReview = async (movie) => {
+    const updateReview = async (id) => {
         await axios.put("http://localhost:3001/api/update",
             {
-                movieName: movie, movieReview: newReview
+                id: id, movieReview: newReview
             })
         setNewReview("")
         getMovies()
@@ -70,7 +70,7 @@ function App() {
                         }
                         }/>
                         <button onClick={async () => {
-                            await updateReview(item.movieName)
+                            await updateReview(item.id)
                         }}>Update
                         </button>
 
